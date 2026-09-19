@@ -1,0 +1,44 @@
+[
+  {
+    "name": "C2_bigface",
+    "lora": "K2_Anime_Flat_V20_nnegret.safetensors",
+    "strength": 0.8,
+    "seed": 5150,
+    "prompt": "flat anime app icon, single cute chibi anime girl face fills most of the frame, close up head portrait, sporty, confident big smile, very large expressive eyes, short black bob hair with a green sweatband, three small round dots beside her cheek in orange and green and blue, thick bold white sticker outline, two tone flat colors, plain very dark navy background, perfectly centered, symmetrical, mobile app icon, no text, bold simple shapes readable at small size"
+  },
+  {
+    "name": "C3_green",
+    "lora": "K2_Anime_Flat_V20_nnegret.safetensors",
+    "strength": 0.85,
+    "seed": 90210,
+    "prompt": "flat anime app icon, chibi anime girl head close up centered, big eyes, cute determined expression, dark green sports headband, hair tied in a short ponytail, thick outline sticker style, flat cel shading with only three flat colors, deep forest green background, generous margin around the face, mobile app icon, no text, minimal geometric, high contrast, crisp"
+  },
+  {
+    "name": "E_flex",
+    "lora": "Niji_Sweet_Spot_Krea2_v2A.safetensors",
+    "strength": 0.85,
+    "seed": 424242,
+    "prompt": "anime app icon, chibi anime girl flexing her arm and smiling confidently, cropped upper body, wearing dark green fitness top, single hero pose, centered, simple flat teal green background with a subtle circular glow behind her, clean bold outlines, flat cel shading, mobile app icon, no text, uncluttered composition readable at small size"
+  },
+  {
+    "name": "E2_ring",
+    "lora": "Niji_Sweet_Spot_Krea2_v2A.safetensors",
+    "strength": 0.88,
+    "seed": 616161,
+    "prompt": "anime style app icon, cute chibi anime girl standing inside a large circular ring, the ring is split into three colored arc segments in orange green and blue, fitness and nutrition tracker theme, girl wears green sportswear, centered circular badge composition, flat vibrant colors, clean bold outlines, plain cream white background, mobile app icon, no text, graphic and readable at small size"
+  },
+  {
+    "name": "F_gym",
+    "lora": "K2_Anime_Flat_V20_nnegret.safetensors",
+    "strength": 0.8,
+    "seed": 777001,
+    "prompt": "flat anime app icon, chibi anime girl in a dynamic gym pose lifting a barbell overhead, strong determined face, green and white sportswear, bold simple silhouette, high contrast flat colors, dark charcoal background with a green spotlight, centered, mobile app icon, no text, minimal details, powerful and readable at small size"
+  },
+  {
+    "name": "G_meal",
+    "lora": "K2_Anime_Flat_V20_nnegret.safetensors",
+    "strength": 0.8,
+    "seed": 888002,
+    "prompt": "flat anime app icon, cute chibi anime girl happily eating from a bowl, close up head and shoulders, chopsticks, fresh vegetables and a chicken breast on the table in front of her, warm friendly expression, green accents, bold clean cartoon outlines, flat cel shading, plain warm orange background, centered, mobile app icon, no text, simple bold shapes"
+  }
+]

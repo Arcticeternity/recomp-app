@@ -1,0 +1,30 @@
+[
+  {
+    "name": "A_shonen",
+    "lora": "K2_Anime_Flat_V20_nnegret.safetensors",
+    "strength": 0.85,
+    "seed": 20260919,
+    "prompt": "flat anime vector app icon, cute chibi anime girl gym coach, short ponytail, big determined eyes, wearing teal green sports tank top, holding a small dumbbell with one hand and giving a thumbs up, cropped square composition, head and shoulders centered, bold clean outlines, flat cel shading, minimal detail, simple dark green gradient background, centered subject, mobile app icon, no text, high contrast, crisp edges"
+  },
+  {
+    "name": "B_niji",
+    "lora": "Niji_Sweet_Spot_Krea2_v2A.safetensors",
+    "strength": 0.85,
+    "seed": 77123,
+    "prompt": "sweet anime app icon illustration, adorable chibi anime girl nutritionist, wavy shoulder length hair, warm smile, holding a rice ball in one hand and a dumbbell in the other, exercise and healthy food theme, cropped square portrait, centered, soft pastel colors, clean line art, flat shading, simple solid orange background, mobile app icon, no text"
+  },
+  {
+    "name": "C_flat",
+    "lora": "K2_Anime_Flat_V20_nnegret.safetensors",
+    "strength": 0.75,
+    "seed": 314159,
+    "prompt": "minimal flat anime app icon, single cute chibi anime girl face, sporty headband, confident smile, big bright eyes, three color coded dots floating beside her cheek, symbolizing protein carbs fat, thick bold outline, two tone flat colors, plain deep navy background, perfectly centered, symmetrical, geometric, mobile app icon, no text, sticker style"
+  },
+  {
+    "name": "D_macro",
+    "lora": "Niji_Sweet_Spot_Krea2_v2A.safetensors",
+    "strength": 0.9,
+    "seed": 888888,
+    "prompt": "anime style app icon, energetic chibi anime girl athlete doing a victory pose with both fists raised, ponytail flying, wearing green workout gear, a plate of healthy food and a dumbbell beside her, circular vignette composition, vibrant saturated colors, crisp cel shading, simple teal background, centered, mobile app icon, no text, clean and bold"
+  }
+]
