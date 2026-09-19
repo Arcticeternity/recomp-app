@@ -31,16 +31,119 @@
 
   <title>增肌减脂</title>
   <link rel="manifest" href="manifest.json">
+
+  <!--
+    启动提示 + 失败显示。
+    本应用在 runApp() 前要初始化 sqlite3 WASM 并灌入静态库（约 1900 条 SQL），
+    手机上这段启动时间原本是纯白画面 —— 用户无法区分「加载中」和「已崩溃」。
+    样式内联，保证在 Flutter 就绪前即可见。
+  -->
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #FBFDF8;
+      font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+    #app-splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      color: #1B5E20;
+      font-size: 15px;
+      text-align: center;
+      padding: 24px;
+      line-height: 1.6;
+    }
+    #app-splash .ring {
+      width: 42px;
+      height: 42px;
+      border: 3px solid #C8E6C9;
+      border-top-color: #1B5E20;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #app-error {
+      display: none;
+      position: fixed;
+      inset: 0;
+      padding: 28px;
+      background: #FBFDF8;
+      color: #B71C1C;
+      font-size: 14px;
+      line-height: 1.7;
+      word-break: break-all;
+      overflow: auto;
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="app-splash">
+    <div class="ring"></div>
+    <div>正在加载增肌减脂…</div>
+  </div>
+  <div id="app-error"></div>
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <script>
+    // 启动追踪：Dart 侧通过 window.bootTrace 打点，控制台里 `__boot` 可查全程。
+    window.__boot = [];
+    window.bootTrace = function (s) {
+      window.__boot.push(s);
+      console.log('[boot] ' + s);
+    };
+
+    // 启动阶段的未捕获错误翻到页面上 —— 白屏最难排查的就是"什么都没有"。
+    function __showError(msg) {
+      var s = document.getElementById('app-splash');
+      var e = document.getElementById('app-error');
+      if (s) s.style.display = 'none';
+      if (e && e.style.display !== 'block') {
+        e.style.display = 'block';
+        e.textContent = '启动失败：' + msg;
+      }
+    }
+    window.addEventListener('error', function (ev) {
+      __showError(ev.message || String(ev.error || '未知错误'));
+    });
+    window.addEventListener('unhandledrejection', function (ev) {
+      var r = ev.reason;
+      __showError((r && (r.message || r.toString())) || '未知异步错误');
+    });
+
+    // 启动超时兜底：给出可操作提示，而不是无限白屏
+    setTimeout(function () {
+      var s = document.getElementById('app-splash');
+      if (s && getComputedStyle(s).display !== 'none') {
+        s.innerHTML =
+          '<strong>启动超时</strong><br>' +
+          '本地数据库初始化较慢，或浏览器限制了 WASM。<br>' +
+          '可尝试：换 Chrome / Edge 打开，或稍后重试。';
+      }
+    }, 30000);
+
+    // Flutter 视图出现即撤掉启动提示。
+    // 注意 main() 在首个 canvas 出现**之前**就完成了（应用在 runApp 前先初始化
+    // 数据库），所以这时隐藏不会露出空白。
+    (function watchFlutter() {
+      var s = document.getElementById('app-splash');
+      if (!s) return;
+      var tries = 0;
+      var timer = setInterval(function () {
+        tries++;
+        if (document.querySelector('flutter-view, flt-glass-pane, canvas')) {
+          clearInterval(timer);
+          s.style.display = 'none';
+        } else if (tries > 600) {
+          clearInterval(timer);
+        }
+      }, 100);
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
