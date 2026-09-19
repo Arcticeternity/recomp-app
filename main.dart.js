@@ -32423,7 +32423,7 @@ $.aOj=s
 $.aWg=!0},
 aP6(){var s=0,r=A.o(t.N),q
 var $async$aP6=A.p(function(a,b){if(a===1)return A.l(b,r)
-for(;;)switch(s){case 0:q=""
+for(;;)switch(s){case 0:q="/"
 s=1
 break
 case 1:return A.m(q,r)}})
