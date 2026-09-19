@@ -17,3 +17,6 @@ void initFactory() {
 
 /// 可写数据库目录（Android/iOS/桌面均为 getDatabasesPath）。
 Future<String> resolveDbDirectory() => getDatabasesPath();
+
+/// 本地 SQLite 不会莫名卡住，不加时间限制。
+Future<T> withInitTimeout<T>(Future<T> future) => future;

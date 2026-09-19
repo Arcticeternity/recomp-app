@@ -1,21 +1,67 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'app_state.dart';
 import 'app_theme.dart';
 import 'core/fitness/fitness_database.dart';
 import 'core/food/local_food_database.dart';
+import 'core/storage/app_repository.dart';
+import 'core/storage/memory_app_repository.dart';
 import 'core/storage/sqlite_app_repository.dart';
 import 'pages/home_shell.dart';
 import 'pages/onboarding_page.dart';
 
+/// 启动步骤的预算上限。
+///
+/// 这些东西全部在 runApp() **之前**执行，任何一步卡死都会让应用永远停在
+/// 白屏（Web 上尤其明显：WASM/IndexedDB 在移动浏览器里可能既慢又不报错）。
+/// 因此每步都给上限，超时就走降级 —— 宁可功能降级，也不能白屏。
+const _mainDbBudget = Duration(seconds: 5);
+const _staticDbBudget = Duration(seconds: 6);
+const _initStateBudget = Duration(seconds: 6);
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final repo = await SqliteAppRepository.openDefault();
-  final foodDb = await LocalFoodDatabase.openFromAsset();
-  final fitnessDb = await FitnessDatabase.openFromAsset();
+
+  final repo = await _openRepository();
+  final foodDb = await _loadGuard(
+    '食物成分表',
+    LocalFoodDatabase.openFromAsset,
+  );
+  final fitnessDb = await _loadGuard(
+    '健身数据',
+    FitnessDatabase.openFromAsset,
+  );
+
   final state = AppState(repo, localFoodDb: foodDb, fitnessDb: fitnessDb);
-  await state.init();
+  try {
+    await state.init().timeout(_initStateBudget);
+  } on TimeoutException {
+    debugPrint('[boot] state.init 超时，以空数据继续启动');
+  }
+
   runApp(RecompApp(state: state));
+}
+
+/// 打开用户数据仓库；Web 上失败/超时则降级为纯内存仓库（本次会话可用）。
+Future<AppRepository> _openRepository() async {
+  try {
+    return await SqliteAppRepository.openDefault().timeout(_mainDbBudget);
+  } catch (e) {
+    debugPrint('[boot] 本地数据库不可用（$e），降级为内存存储');
+    return createMemoryRepository();
+  }
+}
+
+/// 加载只读静态库；失败/超时返回 null（应用已有可空处理）。
+Future<T?> _loadGuard<T>(String label, Future<T> Function() load) async {
+  try {
+    return await load().timeout(_staticDbBudget);
+  } catch (e) {
+    debugPrint('[boot] $label 加载失败（$e），该功能降级');
+    return null;
+  }
 }
 
 class RecompApp extends StatelessWidget {

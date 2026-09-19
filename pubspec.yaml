@@ -52,6 +52,13 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+
+# 锁定 sqlite3 到 3.5.2：3.6.0 起改用 native assets 从 GitHub 下载预编译二进制，
+# 本机网络拿不到（github.com 被干扰），会让 flutter test 构建 native assets 失败。
+# sqflite_common_ffi 的约束是 >=3.1.2 <5.0.0，3.5.2 在范围内。
+dependency_overrides:
+  sqlite3: 3.5.2
+
 flutter:
 
   # The following line ensures that the Material Icons font is

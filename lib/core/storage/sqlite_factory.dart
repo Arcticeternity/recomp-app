@@ -20,3 +20,14 @@ void ensureSqliteFactory() {
 /// Web 返回空串 = 用内存数据库（浏览器没有真实文件系统，数据由
 /// sqflite_common_ffi_web 持久化到 OPFS/IndexedDB）。
 Future<String> dbDirectory() => impl.resolveDbDirectory();
+
+/// 数据库初始化的时间预算（仅 Web 生效）。
+///
+/// Web 上 sqlite3 WASM 可能因浏览器限制卡住且不报错 —— 那种情况下应用
+/// **永远到不了 runApp()**，表现就是纯白屏。给个上限，超时走降级路径：
+/// 宁可功能降级，也不能让用户对着白屏。
+const dbInitTimeout = Duration(seconds: 8);
+
+/// 给数据库初始化加上限。IO 平台不加限制（本地 SQLite 从不卡住）。
+Future<T> withDbInitTimeout<T>(Future<T> future) =>
+    impl.withInitTimeout(future);
