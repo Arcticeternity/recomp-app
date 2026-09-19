@@ -19,7 +19,27 @@ import socketserver
 import sys
 
 
+# Python 的 SimpleHTTPRequestHandler 不认识这些扩展名，会给错 Content-Type：
+# - .wasm 需要 application/wasm，否则 WebAssembly.instantiateStreaming 被拒
+# - .mjs  需要 text/javascript，否则浏览器拒绝当作 ES 模块加载
+# 缺了它们，Flutter Web（尤其 --wasm 构建）在本地预览时会直接起不来。
+EXTRA_TYPES = {
+    '.wasm': 'application/wasm',
+    '.mjs': 'text/javascript',
+    '.js': 'text/javascript',
+    '.otf': 'font/otf',
+    '.ttf': 'font/ttf',
+    '.woff2': 'font/woff2',
+}
+
+
 class IsolatedHandler(http.server.SimpleHTTPRequestHandler):
+    def guess_type(self, path):
+        ext = os.path.splitext(path)[1].lower()
+        if ext in EXTRA_TYPES:
+            return EXTRA_TYPES[ext]
+        return super().guess_type(path)
+
     def end_headers(self):
         self.send_header('Cross-Origin-Opener-Policy', 'same-origin')
         self.send_header('Cross-Origin-Embedder-Policy', 'require-corp')
@@ -37,7 +57,11 @@ class IsolatedHandler(http.server.SimpleHTTPRequestHandler):
 
 def main():
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
-    root = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build', 'web')
+    if len(sys.argv) > 2:
+        # 第二个参数可指定根目录（本地用 base-href 构建测试时有用）
+        root = os.path.abspath(sys.argv[2])
+    else:
+        root = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build', 'web')
     if not os.path.isdir(root):
         sys.exit('未找到 %s，请先执行：flutter build web --release' % root)
 
