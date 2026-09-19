@@ -430,6 +430,68 @@ python serve_web.py          # 默认 8080，带 COOP/COEP
 **已知限制**：静态库每次启动都要重灌（约 1900 条语句），比原生慢；
 Web 只是附加平台，移动端未做任何行为变更。
 
+---
+
+## 十五、线上部署（v16.5）
+
+### 15.1 地址
+
+**https://arcticeternity.github.io/recomp-app/**
+
+- 源码仓库：https://github.com/Arcticeternity/recomp-app （**公开**）
+- 托管：GitHub Pages，源 = `gh-pages` 分支根目录，HTTPS 已强制
+- 结构：`main` 分支放源码，`gh-pages` 分支只放构建产物（**构建产物不入源码历史**）
+
+### 15.2 关键改动：改用 NoWebWorker 模式
+
+**这是能上 GitHub Pages 的前提。**
+
+原先用的 `databaseFactoryFfiWeb` 走 **SharedWorker**，而 SharedWorker 路径依赖
+`SharedArrayBuffer` → 要求页面跨域隔离（COOP/COEP 响应头）。GitHub Pages
+**无法自定义响应头**，所以那条路走不通。
+
+改用 `databaseFactoryFfiWebNoWebWorker`：直接在页面里
+`WasmSqlite3.loadFromUrl` + `IndexedDbFileSystem`，**不依赖 SharedArrayBuffer**。
+
+实测（线上地址，`crossOriginIsolated=false`、`hasSAB=false`）：
+
+```
+sqlite3.wasm                          200
+assets/assets/fitness.sql             200
+assets/assets/food_composition.sql    200
+main.dart.js                          200
+```
+
+副作用：`web/sqflite_sw.js` 不再需要（保留着无妨）。
+
+### 15.3 本地预览（仍然可用）
+
+`serve_web.py` 仍会带 COOP/COEP（无害）。注意 `--base-href` 差异：
+
+- 本地预览用默认 `/`：`flutter build web --release`
+- 线上用子路径：`flutter build web --release --base-href /recomp-app/`
+
+### 15.4 以后怎么更新线上
+
+```bash
+flutter build web --release --base-href /recomp-app/
+# 把 build/web 推到 gh-pages 分支（孤立分支，不含源码）
+```
+
+源码改动正常提交到 `main` 即可。
+
+### 15.5 数据说明（重要）
+
+Web 版数据存在**浏览器本地**（IndexedDB），因此：
+
+- 与手机 App 的数据**互不同步**，是两套独立数据
+- 换浏览器 / 清缓存 / 换设备 → 数据不会跟着走
+- 要做多端同步需要后端，目前没有
+
+**公开仓库提醒**：应用不硬编码任何密钥（智谱 API Key 存在本地
+SQLite `settings` 表），所以公开仓库不含敏感信息。
+
+
 
 
 
